@@ -9,8 +9,8 @@ const SchemaShop = require("../../schema/index")
 
 module.exports = {
 	//获取商品列表
-	getShopList:function(table_name,callback){
-		let URL = `SELECT * FROM ${table_name} ORDER BY createTime ASC`
+	getShopList:function(keys,table_name,callback){
+		let URL = `SELECT * FROM ${table_name} limit ${keys},10`
 		conn.query(URL,function(err,result){
 			for(var i=0;i<result.length;i++){
 				let ct = new Date(result[i].createTime);
@@ -21,7 +21,6 @@ module.exports = {
 			callback(err,result);
 		})
 	},
-	
 	//添加商品列表
 	insertShopList:function(table_name,req,callback){
 		let clos = [];

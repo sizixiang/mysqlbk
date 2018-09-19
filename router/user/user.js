@@ -41,7 +41,6 @@ router.get("/useride", function(req, res, next) {
 
 //注册用户
 router.post("/register", function(req, res, next) {
-	console.log(req.body)
 	ModlesUser.findPostUser("user", req, function(err, ct, formData) {
 		if(err) {
 			res.json(err);
@@ -69,7 +68,6 @@ router.post("/register", function(req, res, next) {
 
 //修改用户信息
 router.post("/update", function(req, res, next) {
-
 	ModlesUser.updateUserInfo("user", req, function(err, result) {
 		if(err) {
 			res.json(err);
@@ -81,19 +79,19 @@ router.post("/update", function(req, res, next) {
 			data: result
 		});
 	})
-	
+
 })
 
 //修改用户密码
-router.post("/uppass",function(req,res,next){
-	ModlesUser.selectUserPass("user",req,function(err,result,data){
+router.post("/uppass", function(req, res, next) {
+	ModlesUser.selectUserPass("user", req, function(err, result, data) {
 		if(err) {
 			res.json(err);
 			return;
 		}
-		if(result == 1){
-			ModlesUser.updateUserPass("user",data,function(err,result){
-				if(err){
+		if(result == 1) {
+			ModlesUser.updateUserPass("user", data, function(err, result) {
+				if(err) {
 					res.json({
 						code: 200,
 						message: '修改失败！'
@@ -102,10 +100,10 @@ router.post("/uppass",function(req,res,next){
 				res.json({
 					code: 200,
 					message: '修改成功！',
-					data:result
+					data: result
 				});
 			})
-		}else{
+		} else {
 			res.json({
 				code: 10022,
 				message: '修改失败,初始密码错误！'
@@ -116,16 +114,18 @@ router.post("/uppass",function(req,res,next){
 
 //登陆操作
 router.post("/login", function(req, res, next) {
-
+		console.log('我在请求登陆');
 	if(!req.session.userInfo) {
 		ModlesUser.findPostLogin("user", req, function(err, result) {
 			if(err) {
 				res.json(err);
 				return;
 			} else if(result.length == 1) {
+				console.log(req.session.cookie);
 				req.session.userInfo = {
 					userId: result[0].id,
-					userName: result[0].user
+					userName: result[0].user,
+					userHead: result[0].userhead,
 				};
 				res.json({
 					code: 200,
@@ -140,8 +140,8 @@ router.post("/login", function(req, res, next) {
 				});
 			}
 		})
-		
-	}else{
+
+	} else {
 		res.json({
 			code: 200,
 			message: '您已登录,请先注销账户~'
@@ -151,15 +151,16 @@ router.post("/login", function(req, res, next) {
 })
 
 //检测当前用户是否登陆
-router.get("/islogin",function(req,res,next){
-	if(!req.session.userInfo){
+router.get("/islogin", function(req, res, next) {
+	//	let userid = req.query.ide;
+	if(!req.session.userInfo) {
 		res.json({
 			code: 10001,
 			states: 'NO',
 			message: '当前状态未登录'
 		})
 		return;
-	}else{
+	} else {
 		res.json({
 			code: 200,
 			states: 'OK',
@@ -169,9 +170,24 @@ router.get("/islogin",function(req,res,next){
 	}
 })
 
+//检测自动登录
+router.get("/automaticlogin", function(req, res, next) {
+	let userid = req.query.ide;
+	let state = req.query.keys;
+})
+
 //注销操作
 router.get("/logout", function(req, res, next) {
-	req.session.userInfo = false;
+	req.session.destroy(function(err) {
+		console.log(req.session)
+		if(err) {
+			res.json({
+				code: 404,
+				message: '注销失败！'
+			})
+			return
+		}
+	})
 	res.json({
 		code: 200,
 		message: '注销成功'

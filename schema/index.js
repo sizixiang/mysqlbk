@@ -6,6 +6,6 @@ module.exports ={
 		return ["user", "password", "createDate"];
 	},
 	indentList:function(){
-		return ["userid","shopid","state","shopname","amount","prick","createTime"]
+		return ["userid","shopid","shopname","amount","prick","createTime"]
 	}
 }

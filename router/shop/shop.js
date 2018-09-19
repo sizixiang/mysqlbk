@@ -8,7 +8,8 @@ const ModleSelect = require("../../modles/select/selectSql")
 
 //获取商品列表接口
 router.get("/shoplist",function(req,res,next){
-	ModleShop.getShopList("shoplist",function(err,result){
+	let keys = parseInt(req.query.keys);
+	ModleShop.getShopList(keys,"shoplist",function(err,result){
 		if(err){
 			res.json({
 				code: 404,

@@ -6,6 +6,8 @@ const zhPass = require("../ide/createids");
 
 const SchemaUser = require("../../schema/index")
 
+const mysql = require("mysql")
+
 module.exports = {
 
 	//查询用户列表
@@ -17,7 +19,8 @@ module.exports = {
 				cols.push({
 					id: result[i].id,
 					user: result[i].user,
-					createTime : result[i].createDate
+					createTime : result[i].createDate,
+					userHead : result[i].userhead
 				})
 			}
 			callback(err, cols);
@@ -74,17 +77,24 @@ module.exports = {
 		let formData = "";
 		//console.log(req.session.userID)
 		req.on('data', function(data) {
+			
 			formData += data;
+//			console.log(formData);
 			formData = queryString.parse(formData);
 			//对密码进行加密
 			let pass = zhPass.encryptPass(formData.password)
 
-			let sql = `select id,user from ${table_name} where user = '${formData.user}' and password = '${pass}'`
+			let sql = `select id,user,userhead from ${table_name} where user = '${formData.user}' and password = '${pass}'`
+			console.log(sql);
 			conn.query(sql, function(err, result) {
+//				console.log(result);
 				callback(err, result)
 			})
 		})
 	},
+	
+	//自定登录
+//	findUserMessage : function()
 
 	//修改用户信息
 	updateUserInfo: function(table_name, req, callback) {
